@@ -193,6 +193,16 @@ public sealed class AppBuilder
     /// 
     /// </summary>
     /// <returns></returns>
+    public AppBuilder DisabledLogger()
+    {
+        WinFormiumLogger.Disabeld = true;
+        return this;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public void Build()
     {
         foreach (var extension in UseExtensions)

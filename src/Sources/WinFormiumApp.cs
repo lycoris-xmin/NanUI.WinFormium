@@ -47,7 +47,6 @@ public sealed class WinFormiumApp
     /// </summary>
     public PlatformArchitecture Architecture { get; private set; }
 
-
     /// <summary>
     /// 
     /// </summary>

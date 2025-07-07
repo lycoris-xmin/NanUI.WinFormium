@@ -15,11 +15,7 @@ internal class DefaultLogger : Logger
     {
         get
         {
-            if (_logger is null)
-            {
-                _logger = new WinFormiumLogger();
-            }
-
+            _logger ??= new WinFormiumLogger();
             return _logger;
         }
         set

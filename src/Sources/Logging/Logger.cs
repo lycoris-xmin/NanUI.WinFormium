@@ -4,6 +4,10 @@
 // GITHUB: https://github.com/XuanchenLin/NanUI
 
 namespace WinFormium.Sources.Logging;
+
+/// <summary>
+/// 
+/// </summary>
 public abstract class Logger
 {
     private static Logger? instance;

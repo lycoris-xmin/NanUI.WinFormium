@@ -8,6 +8,8 @@ using WinFormium.Sources.Logging;
 namespace WinFormium.Sources.Logging;
 internal class WinFormiumLogger : ILogger
 {
+    internal static bool Disabeld { get; set; } = true;
+
     private readonly string _location;
     private readonly string _filename = "WinFormium.log";
     private readonly string _backupFilename = "WinFormium";
@@ -47,32 +49,37 @@ internal class WinFormiumLogger : ILogger
         _maxSizeInKiloBytes = 1000 * maxFileSizeBeforeLogRotation;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TState"></typeparam>
+    /// <param name="logLevel"></param>
+    /// <param name="eventId"></param>
+    /// <param name="state"></param>
+    /// <param name="exception"></param>
+    /// <param name="formatter"></param>
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         if (!IsEnabled(logLevel))
-        {
             return;
-        }
 
         var builder = new StringBuilder();
+
         if (formatter is not null)
-        {
             builder.Append(formatter(state, exception));
-        }
 
         if (exception is not null)
-        {
             builder.Append($" {exception.Message}");
-        }
 
         Log(new LogEntry(logLevel, builder.ToString()));
     }
 
-    public bool IsEnabled(LogLevel logLevel)
-    {
-        return true;
-    }
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="logLevel"></param>
+    /// <returns></returns>
+    public bool IsEnabled(LogLevel logLevel) => Disabeld;
 
     /// <summary>
     /// Log entry.
@@ -101,6 +108,10 @@ internal class WinFormiumLogger : ILogger
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="text"></param>
     private void WriteToFile(string text)
     {
         if (string.IsNullOrEmpty(text))
@@ -126,6 +137,10 @@ internal class WinFormiumLogger : ILogger
         writer.Dispose();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filePath"></param>
     private void CreateCopyOfCurrentLogFile(string filePath)
     {
         try
@@ -150,15 +165,25 @@ internal class WinFormiumLogger : ILogger
         catch { }
     }
 
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
-    {
-        return null;
-    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TState"></typeparam>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
 }
 
-
+/// <summary>
+/// 
+/// </summary>
 public static class LoggerExtensions
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="logger"></param>
+    /// <param name="exception"></param>
     public static void LogError(this ILogger logger, Exception exception)
     {
         logger.LogError(exception, "{exception?.Message}", exception?.Message);

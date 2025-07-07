@@ -39,9 +39,7 @@ internal class WindowBindingObjectServiceServer : IDisposable
                     catch (OperationCanceledException) { }
                     catch (Exception ex)
                     {
-
                         Logger.Instance.Log.LogError(ex);
-
 
                         errorCount++;
 
@@ -68,7 +66,6 @@ internal class WindowBindingObjectServiceServer : IDisposable
 
     private void AcceptClient(NamedPipeServerStream server)
     {
-
         using var stream = new MessageBridgePipeStream(server);
 
         string response = string.Empty;
