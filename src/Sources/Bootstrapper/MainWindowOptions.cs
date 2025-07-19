@@ -3,6 +3,8 @@
 // COPYRIGHTS (C) Xuanchen Lin. ALL RIGHTS RESERVED.
 // GITHUB: https://github.com/XuanchenLin/NanUI
 
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 namespace WinFormium.Sources.Bootstrapper;
 
 /// <summary>
@@ -11,6 +13,7 @@ namespace WinFormium.Sources.Bootstrapper;
 public sealed class MainWindowOptions
 {
     internal ApplicationContext Context { get; set; } = new ApplicationContext();
+
     private IServiceCollection Services { get; }
 
     /// <summary>
@@ -29,7 +32,7 @@ public sealed class MainWindowOptions
     /// <returns></returns>
     public MainWindowCreationAction UseMainForm(Form form)
     {
-        Services.AddSingleton(form);
+        Services.TryAddSingleton(form);
 
         return new MainWindowCreationAction(services =>
         {
@@ -44,7 +47,7 @@ public sealed class MainWindowOptions
     /// <returns></returns>
     public MainWindowCreationAction UseMainForm<T>() where T : Form
     {
-        Services.AddSingleton<T>();
+        Services.TryAddSingleton<T>();
 
         return new MainWindowCreationAction(services =>
         {
@@ -61,7 +64,7 @@ public sealed class MainWindowOptions
     /// <returns></returns>
     public MainWindowCreationAction UseMainFormium(WinFormium.Formium formium)
     {
-        Services.AddSingleton(formium);
+        Services.TryAddSingleton(formium);
 
         return new MainWindowCreationAction(services =>
         {
@@ -72,17 +75,36 @@ public sealed class MainWindowOptions
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    public MainWindowCreationAction UseMainFormium<T>(Func<T> configure) where T : WinFormium.Formium
+    {
+        Services.TryAddSingleton<T>();
+        return new MainWindowCreationAction(services => Context.MainForm = configure.Invoke().HostWindow);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    public MainWindowCreationAction UseMainFormium<T>(Func<IServiceProvider, T> configure) where T : WinFormium.Formium
+    {
+        Services.TryAddSingleton<T>();
+        return new MainWindowCreationAction(sp => Context.MainForm = configure.Invoke(sp).HostWindow);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public MainWindowCreationAction UseMainFormium<T>() where T : WinFormium.Formium
     {
-        Services.AddSingleton<T>();
+        Services.TryAddSingleton<T>();
 
-        return new MainWindowCreationAction(sp =>
-        {
-            var formium = sp.GetRequiredService<T>();
-            Context.MainForm = formium.HostWindow;
-        });
+        return new MainWindowCreationAction(sp => Context.MainForm = sp.GetRequiredService<T>().HostWindow);
     }
 
     /// <summary>
@@ -96,8 +118,6 @@ public sealed class MainWindowOptions
         {
             if (applicationContext != null)
                 Context = applicationContext;
-
-            //Context.MainForm = null;
         });
     }
 
@@ -112,9 +132,7 @@ public sealed class MainWindowOptions
         {
             var applicationContext = creationAction.Invoke();
             if (applicationContext != null)
-            {
                 Context = applicationContext;
-            }
         });
     }
 }

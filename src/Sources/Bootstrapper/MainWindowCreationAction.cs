@@ -21,6 +21,10 @@ public sealed class MainWindowCreationAction : IDisposable
 
     internal Action<IServiceProvider> CreateAction { get; }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="services"></param>
     internal void Invoke(IServiceProvider services)
     {
         CreateAction.Invoke(services);
